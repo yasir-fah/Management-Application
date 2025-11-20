@@ -34,8 +34,9 @@ function App() {
     // User is creating a new project
     content = <NewProject importProjectData={insertProject} cancelProject={handleCancelProject}/>;
   } else if (selectedProjectId !== null) {
-    // User selected an existing project
-    content = <SelectedProject project={savedProjects[selectedProjectId]}/>;
+    // when User selected an existing project
+    const findSelectedProjectById = savedProjects.find((projects) => projects.id === selectedProjectId);
+    content = <SelectedProject project={findSelectedProjectById}/>;
   } else {
     // No project selected
     content = <NoProjectSelected addProject={handleNewProject}/>;

@@ -1,11 +1,10 @@
 import Input from "./Input.jsx";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
  
 
 function NewProject({importProjectData, cancelProject}) {
 
-  const [projectId, setProjectId] = useState(0);
 
   const title = useRef();
   const description = useRef();
@@ -14,7 +13,7 @@ function NewProject({importProjectData, cancelProject}) {
   function handleSave() {
     // 1- save new entry like this form:
     const newEntry = {
-      id: projectId,
+      id: Math.random(),
       title: title.current.value,
       description: description.current.value,
       dueDate: dueDate.current.value
@@ -22,7 +21,7 @@ function NewProject({importProjectData, cancelProject}) {
 
 
     // 2- validate from data:
-  if(newEntry.title === ""){
+    if(newEntry.title === ""){
       alert("title can't be empty !");
       return;
     }
@@ -35,10 +34,7 @@ function NewProject({importProjectData, cancelProject}) {
       return;
     }
 
-    // 3- increment entry's id each time:
-    setProjectId(current => ++current);
-
-    // 4- take the result to app component:
+    // 3- take the result to app component:
     importProjectData(newEntry);
 
   }
