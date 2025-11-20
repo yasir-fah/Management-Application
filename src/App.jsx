@@ -1,72 +1,73 @@
 import ProjectsSidebar from './components/ProjectsSidebar.jsx'
 import NewProject from './components/NewProject.jsx'
 import NoProjectSelected from './components/NoProjectSelected.jsx';
-
-import { useState } from 'react';
 import SelectedProject from './components/SelectedProject.jsx';
+import { useState } from 'react';
 
 function App() {
 
   const [savedProjects, setSavedProjects] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState(null); // null, 'new', or project index
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
 
   function handleNewProject() {
-    setSelectedProjectId('new'); // Special state for "creating new project"
+    setSelectedProjectId('new');
   }
 
   function handleCancelProject() {
-    setSelectedProjectId(null); // Back to "no selection"
+    setSelectedProjectId(null);
   }
 
   function insertProject(project) {
-    setSavedProjects(currentList => [...currentList, project]);
-    setSelectedProjectId(null); // Go back to "no selection" after saving
+    setSavedProjects(list => [...list, { ...project, tasks: [] }]);   
+    setSelectedProjectId(null);
   }
 
   function handleSelectProject(id) {
-    setSelectedProjectId(id); // Set to project index
+    setSelectedProjectId(id);
   }
 
   function handleDelete(id) {
-    // filter object by keeping all that does not match the 'id' we received
-    setSavedProjects((currentList =>{
-      return currentList.filter((project) => project.id !== id);
-    }));
-
-    // reset our selection
-    setSelectedProjectId(null);  
+    setSavedProjects(list => list.filter(project => project.id !== id));
+    setSelectedProjectId(null);
   }
 
-  // Decide what to render based on state
-  let content; 
-  
+  function handleAddTask(projectId, taskText) {
+    setSavedProjects(list =>
+      list.map(project =>
+        project.id === projectId
+          ? { ...project, tasks: [...project.tasks, taskText] } 
+          : project
+      )
+    );
+  }
+
+  let content;
+
   if (selectedProjectId === 'new') {
-    // User is creating a new project
-    content = <NewProject importProjectData={insertProject} cancelProject={handleCancelProject}/>;
+    content = <NewProject importProjectData={insertProject} cancelProject={handleCancelProject} />;
   } else if (selectedProjectId !== null) {
-    // when User selected an existing project
-    try{
-    const findSelectedProjectById = savedProjects.find((projects) => projects.id === selectedProjectId);
-    content = <SelectedProject project={findSelectedProjectById} handleDeleteProject={handleDelete}/>;
-    }catch (Error){
-      alert(Error.message);
-    }
+    const selected = savedProjects.find(p => p.id === selectedProjectId);
+    content = (
+      <SelectedProject
+        project={selected}
+        handleDeleteProject={handleDelete}
+        handleAddTask={handleAddTask}        
+      />
+    );
   } else {
-    // No project selected
-    content = <NoProjectSelected addProject={handleNewProject}/>;
+    content = <NoProjectSelected addProject={handleNewProject} />;
   }
 
   return (
     <aside className='h-screen my-8 flex gap-8'>
-      <ProjectsSidebar 
-        addProject={handleNewProject} 
-        sidebarProject={savedProjects} 
+      <ProjectsSidebar
+        addProject={handleNewProject}
+        sidebarProject={savedProjects}
         selectedProject={handleSelectProject}
       />
       {content}
     </aside>
   );
-
 }
 
 export default App;
