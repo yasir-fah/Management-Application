@@ -27,16 +27,30 @@ function App() {
     setSelectedProjectId(id); // Set to project index
   }
 
+  function handleDelete(id) {
+    // filter object by keeping all that does not match the 'id' we received
+    setSavedProjects((currentList =>{
+      return currentList.filter((project) => project.id !== id);
+    }));
+
+    // reset our selection
+    setSelectedProjectId(null);  
+  }
+
   // Decide what to render based on state
-  let content;
+  let content; 
   
   if (selectedProjectId === 'new') {
     // User is creating a new project
     content = <NewProject importProjectData={insertProject} cancelProject={handleCancelProject}/>;
   } else if (selectedProjectId !== null) {
     // when User selected an existing project
+    try{
     const findSelectedProjectById = savedProjects.find((projects) => projects.id === selectedProjectId);
-    content = <SelectedProject project={findSelectedProjectById}/>;
+    content = <SelectedProject project={findSelectedProjectById} handleDeleteProject={handleDelete}/>;
+    }catch (Error){
+      alert(Error.message);
+    }
   } else {
     // No project selected
     content = <NoProjectSelected addProject={handleNewProject}/>;
